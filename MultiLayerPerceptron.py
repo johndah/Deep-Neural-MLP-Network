@@ -150,7 +150,7 @@ class Perceptron(object):
 
         N = X.shape[1]
         #   loss = crossEntropy + regularizationCost
-        loss = -(1 / N) * sum(log(diag(dot(targets.T, p)))) + self.lmbda * (sum(W[0] ** 2) + sum(W[1] ** 2))
+        loss = -(1 / N) * sum(log(diag(dot(targets.T, p)))) + self.lmbda * sum([sum(W[i]**2) for i in range(len(W))])
 
         return loss
 
@@ -337,9 +337,6 @@ class Perceptron(object):
                     c2 = self.computeCost(X, targets, WTry, self.b)
                     gradWnum[layer][i, j] = (c2 - c1) / (2 * h)
 
-                #if i % (self.W[layer].shape[0] / 100) == 0:
-                #    print('GradNum process: ' + str(i / self.W[0].shape[0] * 100))
-
         return gradWnum, gradBnum
 
     def testComputedGradients(self):
@@ -377,11 +374,11 @@ class Perceptron(object):
                 differenceBSmall[layer][0, i] = "{:.2e}".format(differenceB[bS[i]][0])
 
             print('\nLayer ' + str(layer + 1) + ':')
-            print('Absolute differences of W:')
+            print('Absolute relative differences of W:')
             print(differenceWSmall[layer])
             # print(pMatrix(differenceWSmall[layer]))
 
-            print('Absolute differences of B:')
+            print('Absolute relative differences of B:')
             print(differenceBSmall[layer])
             # print(pMatrix(differenceBSmall[layer]))
 
@@ -509,7 +506,7 @@ def main():
 
     useFullSet = False
     generateRandomEtaLambdaPair = False
-    testComputedGradients = True
+    testComputedGradients = False
 
     # Data, One hot targets, Targets with scalar label
     X, targets, targetsScalars = loadBatch(useFullSet)
@@ -523,7 +520,7 @@ def main():
         'lmbda': 3.16e-6,
         'rho': 0.9,
         'alpha': 0.99,
-        'nEpochs': 10,
+        'nEpochs': 40,
         'nBatch': 100,
         'hiddenLayerSizes': [50, 30],
         'weightInit': 'He',
@@ -532,16 +529,21 @@ def main():
         'plotProcess': True
     }
 
+    perceptron = Perceptron(attributes)
+
+    # Find good pairs (eta, lambda) for learning rate and regularization constant
     if generateRandomEtaLambdaPair:
         nPairs = 25
         fileName = 'bestPairsFineMLP4'
         generateRandomPair(attributes, nPairs, fileName)
         getTopTuples(fileName, nPairs)
     else:
-        perceptron = Perceptron(attributes)
         bestValidAcc = perceptron.miniBatchGD()
 
+    # Compare relative difference between analytical and numerical gradients
     if testComputedGradients:
+        # The actual gradient is to be compared and not the moving average
+        attributes['alpha'] = 1
         perceptron.testComputedGradients()
 
 
