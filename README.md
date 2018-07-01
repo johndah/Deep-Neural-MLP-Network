@@ -1,6 +1,10 @@
 # Deep-Neural-MLP-Network
 Multi-Layer Perceptron implemented to predict labels of the Cifar data set of handwritten digits. 
-It is way more stable than the shallow network uploaded and is robust for higher learning rates and way deeper networks, even if this specific implementation shallow. 
+It is way more stable than the shallow network uploaded and is robust for higher learning rates and way deeper networks, even if this specific implementation is shallow (2 hidden layers). 
+
+Plots learning curve with training and validation error:
+
+![](https://github.com/johndah/Deep-Neural-MLP-Network/blob/master/Learning%20Curve.png)
 
 Some applied attributes are
 * ReLu activation function,
